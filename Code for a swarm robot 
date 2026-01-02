@@ -1,0 +1,75 @@
+leader code for esp32 swarm robot 
+
+#include <WiFi.h>
+#include <esp_now.h>
+#include <BLEDevice.h>
+#include <BLEScan.h>
+
+#define LM_F 26
+#define LM_R 27
+#define RM_F 14
+#define RM_R 12
+
+int targetRSSI = -65;
+float heading = 0.0;
+
+typedef struct {
+  float heading;
+  bool alive;
+} LeaderPacket;
+
+LeaderPacket packet;
+
+BLEScan* scan;
+
+void forward() {
+  digitalWrite(LM_F, HIGH);
+  digitalWrite(RM_F, HIGH);
+  digitalWrite(LM_R, LOW);
+  digitalWrite(RM_R, LOW);
+}
+
+void stopMotors() {
+  digitalWrite(LM_F, LOW);
+  digitalWrite(RM_F, LOW);
+  digitalWrite(LM_R, LOW);
+  digitalWrite(RM_R, LOW);
+}
+
+class CB : public BLEAdvertisedDeviceCallbacks {
+  void onResult(BLEAdvertisedDevice d) {
+    if (d.haveServiceUUID() &&
+        d.getServiceUUID().toString() ==
+        "12345678-1234-1234-1234-1234567890ab") {
+
+      int rssi = d.getRSSI();
+      if (rssi < targetRSSI) forward();
+      else stopMotors();
+    }
+  }
+};
+
+void setup() {
+  pinMode(LM_F, OUTPUT);
+  pinMode(LM_R, OUTPUT);
+  pinMode(RM_F, OUTPUT);
+  pinMode(RM_R, OUTPUT);
+
+  WiFi.mode(WIFI_STA);
+  esp_now_init();
+
+  BLEDevice::init("Leader");
+  scan = BLEDevice::getScan();
+  scan->setAdvertisedDeviceCallbacks(new CB());
+  scan->setActiveScan(true);
+}
+
+void loop() {
+  scan->start(1, false);
+
+  packet.heading = heading;
+  packet.alive = true;
+
+  esp_now_send(NULL, (uint8_t*)&packet, sizeof(packet));
+  delay(50);
+}
