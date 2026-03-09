@@ -1,7 +1,1 @@
-ESP32 Swarm Robot Code – Project Description
-The project entails the development of an efficient small-scale swarm robotics system utilizing ESP32 microcontrollers. The robots are designed to perform autonomously while interacting with other robots via wireless communication.
-Main features:
-Autonomous Navigation: The robots are capable of autonomous movement and obstacle avoidance with the help of sensors.
-Swarm Coordination: The robots are capable of coordinating with other robots and performing various actions with the help of wireless communication.
-Modular and Reusable Code: The code is designed in such a way that more functions and operations can be integrated into the system.
-Real-time Decision-Making: The robots are capable of making decisions in real time with the help of sensors and other robots.
+ This has the schematics for my custom dev board that i developed with auto programming transistors, a good set of decoupling capacitors, an AMS 1117 voltage regulators, USB C connectivity, and some mildy drunk IO pin placement 
